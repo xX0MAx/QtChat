@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>ClientPage.ui</file>
+        <file>ServerPage.ui</file>
+    </qresource>
+</RCC>
