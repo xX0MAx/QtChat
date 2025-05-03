@@ -134,6 +134,17 @@ public slots:
                     connect(s, &Server::messageUserList, this, &MainWindow::appendMessageToUserList);
                     connect(s, &Server::setUserList, this, &MainWindow::updateUserList);
 
+
+                    if(ListUser!=nullptr){
+                        ListUser->clear();
+                    }
+                    if(logs!=nullptr){
+                        logs->clear();
+                    }
+                    if(chat!=nullptr){
+                        chat->clear();
+                    }
+
                     s->Start(portNumber);
                     delete windowInfo;
                     windowInfo = nullptr;
@@ -186,6 +197,7 @@ public slots:
                     if (IPadress != "" && portNumber != 0) {
                         c = new Client(IPadress, portNumber);
                         connect(c, &Client::messageToClientChat, this, &MainWindow::appendMessageToClientChat);
+                        appendMessageToClientChat("\n    New Chat\n");
                         delete windowInfo;
                         windowInfo = nullptr;
                     }
@@ -196,6 +208,7 @@ public slots:
 
     void DisconnectFromServer(){
         if(c!=nullptr){
+            appendMessageToClientChat("\n    You Disconnect\n");
             c->disconnectFromServer();
             delete c;
             c = nullptr;
@@ -213,14 +226,20 @@ private slots:
     }
 
     void appendMessageToLogs(const QString &message) {
-        QTextBrowser *logs = stackedWidget->widget(0)->findChild<QTextBrowser *>("textBrowser");
+        logs = stackedWidget->widget(0)->findChild<QTextBrowser *>("textBrowser");
         if (logs) {
             logs->append(message);
+        }
+        QFile file(QCoreApplication::applicationDirPath() + "/logs.txt");
+        if (file.open(QIODevice::Append | QIODevice::Text)) {
+            QTextStream out(&file);
+            out << message << "\n";
+            file.close();
         }
     }
 
     void appendMessageToChat(const QString &message) {
-        QTextBrowser *chat = stackedWidget->widget(0)->findChild<QTextBrowser *>("textBrowser_2");
+        chat = stackedWidget->widget(0)->findChild<QTextBrowser *>("textBrowser_2");
         if (chat) {
             chat->append(message);
         }
@@ -253,7 +272,9 @@ private:
 
     Server *s = nullptr;
     Client *c = nullptr;
-    QListWidget *ListUser;
+    QListWidget *ListUser = nullptr;
+    QTextBrowser *chat = nullptr;
+    QTextBrowser *logs = nullptr;
 
     QWidget* loadUi(const QString &fileName) {
         QFile file(fileName);

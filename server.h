@@ -7,6 +7,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QHostInfo>
+#include <QHostAddress>
 
 class Server : public QTcpServer{
 
